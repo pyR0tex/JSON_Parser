@@ -6,7 +6,7 @@ from jsonParser import JSON_Parser, JSON_Exception
 import argparse
 
 def Main(args):
-    print("--> main")
+    print(f"        --> JSON PARSER <--", end="\n\n")
     
     flag = CheckJson(args)
     if flag:
@@ -27,13 +27,18 @@ def ReadJSON(fileName):
             fileContent = f.read()
             print(f"{fileContent}")
 
-    except FileNotFoundError as e:
+    except FileNotFoundError as FNF:
+        import sys
+        print(f"        Program Failed while reading file: {file}")
+        print(f"    [ERROR] -> {FNF}", file=sys.stderr) 
+        sys.exit(1)
+    except JSON_Exception as e:
         import sys
         print(f"        Program Failed while reading file: {file}")
         print(f"    [ERROR] -> {e}", file=sys.stderr) 
         sys.exit(1)
     
-    return
+    return 
 
 def CheckJson(args) -> bool:
     '''
