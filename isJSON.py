@@ -16,15 +16,14 @@ def Main(args):
 
     return
 
-
+'''
+Reads the JSON File
+'''
 def ReadJSON(fileName):
-    '''
-    Reads the JSON File
-    '''
     file = fileName
     jsonParser = JSON_Parser()
     try:
-        with open(file, "r") as f:
+        with open(file) as f:
             fileContent = f.read()
             print(f"{fileContent}")
             print(f"{jsonParser.jsonParse(fileContent)}")
@@ -42,10 +41,10 @@ def ReadJSON(fileName):
     
     return 
 
+'''
+Checks if user provided an arg file
+'''
 def CheckJson(args) -> bool:
-    '''
-    Checks if user provided an arg file
-    '''
     if args.test:
         RunTests()
         flag = False
@@ -62,11 +61,10 @@ def CheckJson(args) -> bool:
     return flag
 
 
+'''
+Initialize arparse to accept an input file
+'''
 def SetupArgs():
-
-    '''
-    Initialize arparse to accept an input file
-    '''
     argParser = argparse.ArgumentParser(
         prog="isJson",
         description="-- Tells the user if the input JSON file is formatted correctly"
@@ -96,3 +94,5 @@ TESTS / MAIN RUN
 if __name__ == '__main__':
     args = SetupArgs()
     Main(args)
+
+    pass

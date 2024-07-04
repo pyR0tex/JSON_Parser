@@ -20,18 +20,51 @@ class JSON_Parser:
         self.jsonStr = fileContent
         self.depth = 0
         
-        '''
-        Add code to skip whitespace 
+        if len(self.jsonStr) == 0:
+            raise JSON_Exception('Empty File')
+        
+        self.skip_whitespace()
 
-        Here
-        '''
-
-        if fileContent[self.index] not in ["{", "["]:
+        if self.jsonStr[self.index] not in ["{", "["]:
             raise JSON_Exception('a valid JSON payload should be an object or array')
+        
         result = self.parseValue()
+
+        try:
+            self.skip_whitespace()
+            char = self.jsonStr[self.index]
+            raise JSON_Exception(f'Invalid JSON: Extra character "{char}" after closing brace ')
+        except IndexError:
+            pass
+
         return result
+
+    def skip_whitespace(self):
+        while self.index < len(self.jsonStr) and self.jsonStr[self.index] in WHITESPACE:
+            self.index += 1
 
     def parseValue(self):
-        result = "      parseValue() -> in progress"
-
+        result = self.parseObject()
+        
         return result
+    
+
+    def parseObject(self):
+        if self.jsonStr[self.index] == "{":
+            # increment index
+            # increment depth
+            self.skip_whitespace()
+            result = {}
+            openingBrace = True
+            
+            while self.jsonStr[self.index] != "}":
+                pass
+
+            self.index += 1
+            self.depth += 1
+            return result
+
+
+if __name__ == '__main__':
+    jsonParser = JSON_Parser()
+        
