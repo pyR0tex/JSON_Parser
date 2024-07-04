@@ -10,9 +10,9 @@ def Main(args):
     
     flag = CheckJson(args)
     if flag:
-        print(f"        JSON -> VALID")
+        print(f"    result: JSON -> VALID")
     else:
-        print(f"        JSON -> INVALID")
+        print(f"    result: JSON -> INVALID")
 
     return
 
@@ -22,10 +22,12 @@ def ReadJSON(fileName):
     Reads the JSON File
     '''
     file = fileName
+    jsonParser = JSON_Parser()
     try:
-        with open(file) as f:
+        with open(file, "r") as f:
             fileContent = f.read()
             print(f"{fileContent}")
+            print(f"{jsonParser.jsonParse(fileContent)}")
 
     except FileNotFoundError as FNF:
         import sys
@@ -44,13 +46,18 @@ def CheckJson(args) -> bool:
     '''
     Checks if user provided an arg file
     '''
-    if args.JSON_File:
-        print(f"        File Provided: {args.JSON_File}")
-        ReadJSON(str(args.JSON_File))
-        flag = True
-    else:
-        print(f"        No input JSON file provided")
+    if args.test:
+        RunTests()
         flag = False
+    else:
+        if args.JSON_File:
+            print(f"        File Provided: {args.JSON_File}")
+            ReadJSON(str(args.JSON_File))
+            flag = True
+        else:
+            print(f"        No input JSON file provided")
+            print(f"        --> standard input IN PORGRESS\n")
+            flag = False
 
     return flag
 
@@ -62,17 +69,26 @@ def SetupArgs():
     '''
     argParser = argparse.ArgumentParser(
         prog="isJson",
-        description="Tells the user if the input JSON file is formatted correctly"
+        description="-- Tells the user if the input JSON file is formatted correctly"
     )
     argParser.add_argument(
         'JSON_File',
         nargs='?',
-        help='Provide a JSON file to validate'
+        help='-- Provide a JSON file to validate'
+    )
+    argParser.add_argument(
+        '--test',
+        '-t',
+        nargs='?',
+        help='-- Run the pre-written tests'
     )
 
     args = argParser.parse_args()
     return args
 
+def RunTests():
+    print(f"        --- Running Test Scripts ---")
+    print(f"        --> IN PROGRESS \n")
 
 '''
 TESTS / MAIN RUN
