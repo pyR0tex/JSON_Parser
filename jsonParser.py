@@ -1,6 +1,6 @@
 # JSON Parser class
 
-class JsonException(Exception):
+class JSON_Exception(Exception):
     pass
 
 class JSON_Parser:
