@@ -26,14 +26,14 @@ class JSON_Parser:
         self.skip_whitespace()
 
         if self.jsonStr[self.index] not in ["{", "["]:
-            raise JSON_Exception('a valid JSON payload should be an object or array')
+            raise JSON_Exception('a valid JSON payload should be an object or array\n')
         
         result = self.parseValue()
 
         try:
             self.skip_whitespace()
             char = self.jsonStr[self.index]
-            raise JSON_Exception(f'Invalid JSON: Extra character "{char}" after closing brace ')
+            raise JSON_Exception(f'Invalid JSON: Extra character "{char}" after closing brace\n')
         except IndexError:
             pass
 
@@ -51,14 +51,17 @@ class JSON_Parser:
 
     def parseObject(self):
         if self.jsonStr[self.index] == "{":
-            # increment index
-            # increment depth
+            self.index += 1
+            self.depth += 1
             self.skip_whitespace()
             result = {}
             openingBrace = True
             
-            while self.jsonStr[self.index] != "}":
-                pass
+            try:
+                while self.jsonStr[self.index] != "}":
+                    break
+            except EOFError:
+                print(f"End of JSON object not found")
 
             self.index += 1
             self.depth += 1
