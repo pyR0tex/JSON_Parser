@@ -15,6 +15,7 @@ class JSON_Parser:
     def jsonPrint(self):
         print("JSON Parser")
     
+    # Entry from isJSON.py
     def jsonParse(self, fileContent):
         self.index = 0
         self.jsonStr = fileContent
@@ -22,6 +23,9 @@ class JSON_Parser:
         
         if len(self.jsonStr) == 0:
             raise JSON_Exception('Empty File')
+        
+        if len(self.jsonStr) == 1:
+            raise JSON_Exception('File has only 1 character')
         
         self.skip_whitespace()
 
@@ -60,11 +64,11 @@ class JSON_Parser:
             try:
                 while self.jsonStr[self.index] != "}":
                     break
-            except EOFError:
-                print(f"End of JSON object not found")
+            except Exception as e:
+                raise(f"{e}")
 
             self.index += 1
-            self.depth += 1
+            self.depth -= 1
             return result
 
 
