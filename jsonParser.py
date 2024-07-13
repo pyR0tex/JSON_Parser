@@ -29,8 +29,8 @@ class JSON_Parser:
         
         self.skip_whitespace()
 
-        if self.jsonStr[self.index] not in ["{", "["]:
-            raise JSON_Exception('a valid JSON payload should be an object or array {{}}, []\n')
+        if self.jsonStr[self.index] not in ["{"]:
+            raise JSON_Exception('a valid JSON payload should be an object or array {}\n')
         
         result = self.parseValue()
 
@@ -51,14 +51,13 @@ class JSON_Parser:
         if self.index < len(self.jsonStr) and self.jsonStr[self.index] == ":":
             self.index += 1
         else:
-            raise JSON_Exception(f"Colon expected after Key")
+            raise JSON_Exception(f"        [ERROR] -> Colon expected after Key")
 
     # Parses the value accordingly
     def parseValue(self):
         result = self.parseString()
         if result == None:
             result = self.parseObject()
-        
         return result
     
     def parseString(self):
@@ -72,8 +71,11 @@ class JSON_Parser:
                     self.index += 1
                 self.index += 1
                 return result
+        except IndexError:
+                raise JSON_Exception(f"Invalid JSON: Missing closing quote")
         except Exception as e:
-            raise JSON_Exception(f'Failed while Parsing String: {e}')
+            raise JSON_Exception(f'        [ERROR] --> Failed while Parsing String: {e}')
+        
 
 
     def parseObject(self):
@@ -84,39 +86,28 @@ class JSON_Parser:
             result = {}
             openingBrace = True
             
-            try:
-                while self.jsonStr[self.index] != "}":
-                    '''
-                    Add code for:
-                    if not opening brace:
-                        skip white
-                        colon
-                        skip white
-                    '''
-                    if not openingBrace:
-                        self.skip_whitespace()
-                        self.process_colon()
-                        self.skip_whitespace()
-
-                    key = self.parseString()
-                    # at or before colon
+            while self.jsonStr[self.index] != "}":
+                if not openingBrace:
                     self.skip_whitespace()
                     self.process_colon()
                     self.skip_whitespace()
-                    value = self.parseValue()
-                    result[key] = value
-                    self.index += 1
-                    openingBrace = False
 
-            except Exception as e:
-                print(f"{e}")
+                key = self.parseString()
+                # at or before colon
+                self.skip_whitespace()
+                self.process_colon()
+                self.skip_whitespace()
+                value = self.parseValue()
+                result[key] = value
+                self.index += 1
+                openingBrace = False
 
-            self.index += 1
+            #self.index += 1
             self.depth -= 1
             return result
 
-
 if __name__ == '__main__':
     jsonParser = JSON_Parser()
-    test = '{"Key" :}'
+    test = '{"key": "value"}'
     result = jsonParser.jsonParse(test)
+    print(result)
