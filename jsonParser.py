@@ -1,3 +1,9 @@
+'''
+SET TO 0 if you don't want to debug
+'''
+import os
+os.environ['PYTHONBREAKPOINT'] = '0'
+
 # JSON Parser class
 
 WHITESPACE = [" ", "\n", "\t", "\r"]
@@ -30,12 +36,15 @@ class JSON_Parser:
         self.skip_whitespace()
 
         if self.jsonStr[self.index] not in ["{"]:
-            raise JSON_Exception('a valid JSON payload should be an object or array {}\n')
+           raise JSON_Exception('a valid JSON payload should be an object or array {}\n')
         
+        breakpoint()
+
         result = self.parseValue()
 
         try:
             self.skip_whitespace()
+            print(f"index: {self.index}")
             char = self.jsonStr[self.index]
             raise JSON_Exception(f'Invalid JSON: Extra character "{char}" after closing brace\n')
         except IndexError:
@@ -55,12 +64,18 @@ class JSON_Parser:
 
     # Parses the value accordingly
     def parseValue(self):
+
+        breakpoint()
+
         result = self.parseString()
         if result == None:
             result = self.parseObject()
         return result
     
     def parseString(self):
+
+        breakpoint()
+
         try:
             if self.jsonStr[self.index] == '"':
                 result = ""
@@ -87,9 +102,10 @@ class JSON_Parser:
             openingBrace = True
             
             while self.jsonStr[self.index] != "}":
+
                 if not openingBrace:
                     self.skip_whitespace()
-                    self.process_colon()
+                    # process comma
                     self.skip_whitespace()
 
                 key = self.parseString()
@@ -99,10 +115,10 @@ class JSON_Parser:
                 self.skip_whitespace()
                 value = self.parseValue()
                 result[key] = value
-                self.index += 1
+                self.skip_whitespace()
                 openingBrace = False
 
-            #self.index += 1
+            self.index += 1
             self.depth -= 1
             return result
 

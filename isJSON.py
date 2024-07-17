@@ -93,7 +93,6 @@ def RunTests():
             s2 -- STEP 2 Tests\n \
             s3 -- STEP 3 Tests\n \
             s4 -- STEP 4 Tests\n\n")
-    print(test_input)
     try:
 
         ## STEP 1
