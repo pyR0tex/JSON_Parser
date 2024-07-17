@@ -17,12 +17,20 @@ class JSON_Parser:
         self.index = 0
         self.jsonStr = ""
         self.depth = 0
-    
-    def jsonPrint(self):
-        print("JSON Parser")
+
+    def getIndex(self):
+        '''
+        Returns the index
+        '''
+        return self.index
     
     # Entry from isJSON.py
     def jsonParse(self, fileContent):
+        '''
+        Parses the JSON file
+
+        Input: File Content of input file
+        '''
         self.index = 0
         self.jsonStr = fileContent
         self.depth = 0
@@ -41,12 +49,12 @@ class JSON_Parser:
         breakpoint()
 
         result = self.parseValue()
-
+        if not result:
+            raise JSON_Exception(f'     Missing closing brace')
         try:
             self.skip_whitespace()
-            print(f"index: {self.index}")
             char = self.jsonStr[self.index]
-            raise JSON_Exception(f'Invalid JSON: Extra character "{char}" after closing brace\n')
+            raise JSON_Exception(f'     Extra character "{char}" after closing brace\n')
         except IndexError:
             pass
 
@@ -60,8 +68,14 @@ class JSON_Parser:
         if self.index < len(self.jsonStr) and self.jsonStr[self.index] == ":":
             self.index += 1
         else:
-            raise JSON_Exception(f"        [ERROR] -> Colon expected after Key")
-
+            raise JSON_Exception(f"     Colon expected")
+    
+    def process_comma(self):
+        if self.index < len(self.jsonStr) and self.jsonStr[self.index] == ",":
+            self.index += 1
+        else:
+            raise JSON_Exception(f"     Comma expected")
+        
     # Parses the value accordingly
     def parseValue(self):
 
@@ -72,6 +86,7 @@ class JSON_Parser:
             result = self.parseObject()
         return result
     
+    # Parses string values
     def parseString(self):
 
         breakpoint()
@@ -87,41 +102,48 @@ class JSON_Parser:
                 self.index += 1
                 return result
         except IndexError:
-                raise JSON_Exception(f"Invalid JSON: Missing closing quote")
+                raise JSON_Exception(f"     Missing closing quote")
         except Exception as e:
-            raise JSON_Exception(f'        [ERROR] --> Failed while Parsing String: {e}')
-        
+            raise JSON_Exception(f'     Failed while Parsing String: {e}')
+        return None
 
-
+    # Parses the JSON Object or inner objects
     def parseObject(self):
-        if self.jsonStr[self.index] == "{":
-            self.index += 1
-            self.depth += 1
-            self.skip_whitespace()
-            result = {}
-            openingBrace = True
-            
-            while self.jsonStr[self.index] != "}":
+        try:
+            if self.jsonStr[self.index] == "{":
+                self.index += 1
+                self.depth += 1
+                self.skip_whitespace()
+                result = {}
+                openingBrace = True
+                
+                while self.jsonStr[self.index] != "}":
 
-                if not openingBrace:
+                    if not openingBrace:
+                        self.skip_whitespace()
+                        self.process_comma()
+                        self.skip_whitespace()
+
+                    key = self.parseString()
+                    if not key:
+                        raise JSON_Exception(f"     Key expected")
                     self.skip_whitespace()
-                    # process comma
+                    self.process_colon()
                     self.skip_whitespace()
+                    value = self.parseValue()
+                    if not value:
+                        raise JSON_Exception(f"     Value expected")
+                    result[key] = value
+                    self.skip_whitespace()
+                    openingBrace = False
 
-                key = self.parseString()
-                # at or before colon
-                self.skip_whitespace()
-                self.process_colon()
-                self.skip_whitespace()
-                value = self.parseValue()
-                result[key] = value
-                self.skip_whitespace()
-                openingBrace = False
-
-            self.index += 1
-            self.depth -= 1
-            return result
-
+                self.index += 1
+                self.depth -= 1
+                return result
+        except IndexError:
+                raise JSON_Exception(f"     Missing closing brace")
+        
+        return None
 if __name__ == '__main__':
     jsonParser = JSON_Parser()
     test = '{"key": "value"}'

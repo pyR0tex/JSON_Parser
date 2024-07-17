@@ -6,16 +6,21 @@ from jsonParser import JSON_Parser, JSON_Exception
 import argparse
 import sys, os
 
+'''
+Main Method
+'''
 def Main(args):
     print()
     print(f"        --> JSON PARSER <--", end="\n\n")
     
+    # print result depending on bool flag
     flag = CheckJson(args)
     if flag:
         print(f"\n        result:   JSON file --> VALID\n")
+        sys.exit(0)
     else:
         print(f"\n        result:   JSON file --> INVALID\n")
-    sys.exit(0)
+        sys.exit(1)
 
 '''
 Reads the JSON File
@@ -23,14 +28,19 @@ Reads the JSON File
 def ReadJSON(fileName) -> bool:
     file = fileName
     jsonParser = JSON_Parser()
-
     try:
         with open(file) as f:
             fileContent = f.read()
+            '''
             print(f"        Parsed Content:\n \
-                            --> {jsonParser.jsonParse(fileContent)} <--")
+                    --> {jsonParser.jsonParse(fileContent)} <--")
             return True
-
+            '''
+            result = jsonParser.jsonParse(fileContent)
+            print(f"        Parsed File: {file}\n")
+            print(f"{fileContent}")
+            return True
+        
     except FileNotFoundError as FNF:
         print(f"        Program Failed while reading file: {file}")
         print(f"        [ERROR] -> {FNF}\n", file=sys.stderr)
@@ -38,6 +48,7 @@ def ReadJSON(fileName) -> bool:
     
     except JSON_Exception as e:
         print(f"        Program Failed while parsing file: {file}")
+        print(f"        at index: ({jsonParser.getIndex()})")
         print(f"        [ERROR] -> {e}\n") 
         return False
         
@@ -50,12 +61,11 @@ def CheckJson(args) -> bool:
         RunTests()
     else:
         if args.JSON_File:
-            print(f"        File Provided: {args.JSON_File}")
             flag = ReadJSON(str(args.JSON_File))
         else:
-            print(f"        No input JSON file provided")
-            print(f"        --> standard input IN PORGRESS\n")
-            flag = False
+            print(f"        No input JSON file provided\n")
+            inFile = input("        Enter .json file path: ")
+            flag = ReadJSON(str(inFile))
 
     return flag
 
