@@ -42,14 +42,14 @@ def ReadJSON(fileName) -> bool:
             return True
         
     except FileNotFoundError as FNF:
-        print(f"        Program Failed while reading file: {file}")
-        print(f"        [ERROR] -> {FNF}\n", file=sys.stderr)
+        print(f"        failed while reading file: {file}")
+        print(f"        ERROR -> {FNF}\n", file=sys.stderr)
         return False 
     
     except JSON_Exception as e:
-        print(f"        Program Failed while parsing file: {file}")
-        print(f"        at index: ({jsonParser.getIndex()})")
-        print(f"        [ERROR] -> {e}\n") 
+        print(f"        failed while parsing file: {file}")
+        print(f"        -> at index: ({jsonParser.getIndex()})")
+        print(f"        -->   ERROR: {e}\n") 
         return False
         
 
@@ -102,7 +102,11 @@ def RunTests():
             s1 -- STEP 1 Tests\n \
             s2 -- STEP 2 Tests\n \
             s3 -- STEP 3 Tests\n \
-            s4 -- STEP 4 Tests\n\n")
+            s4 -- STEP 4 Tests\n \
+            q  -- Quit\n\n \
+                                \n \
+    -------------->  ")
+    print()
     try:
 
         ## STEP 1
@@ -179,6 +183,9 @@ def RunTests():
                         print(f"\n        result:   JSON file --> VALID\n")
                     else:
                         print(f"\n        result:   JSON file --> INVALID\n")
+        ## Quit
+        elif test_input.startswith('q'):
+            pass
         else:
             print(f"        ERROR: Bad Input, running again\n")
             RunTests()
@@ -186,12 +193,12 @@ def RunTests():
         sys.exit(0)
 
     except JSON_Exception as json_e:
-        print(f"        [ERROR] -> {json_e}\n")
+        print(f"        ERROR -> {json_e}\n")
         print(f"\n        result:   JSON file --> INVALID\n")
         sys.exit(1)
         return 
     except Exception as e:
-        print(f"        [ERROR] -> {e}\n")
+        print(f"        ERROR -> {e}\n")
         print(f"\n        result:   JSON file --> INVALID\n")
         sys.exit(1)
         return 

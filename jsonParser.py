@@ -36,10 +36,10 @@ class JSON_Parser:
         self.depth = 0
         
         if len(self.jsonStr) == 0:
-            raise JSON_Exception('Empty File')
+            raise JSON_Exception('  Empty File')
         
         if len(self.jsonStr) == 1:
-            raise JSON_Exception('File has only 1 character')
+            raise JSON_Exception('  File has only 1 character')
         
         self.skip_whitespace()
 
@@ -49,8 +49,10 @@ class JSON_Parser:
         breakpoint()
 
         result = self.parseValue()
+        '''
         if not result:
             raise JSON_Exception(f'     Missing closing brace')
+        '''
         try:
             self.skip_whitespace()
             char = self.jsonStr[self.index]
@@ -102,7 +104,7 @@ class JSON_Parser:
                 self.index += 1
                 return result
         except IndexError:
-                raise JSON_Exception(f"     Missing closing quote")
+            raise JSON_Exception(f"     Missing closing quote")
         except Exception as e:
             raise JSON_Exception(f'     Failed while Parsing String: {e}')
         return None
