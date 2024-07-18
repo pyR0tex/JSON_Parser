@@ -37,7 +37,8 @@ def ReadJSON(fileName) -> bool:
             return True
             '''
             result = jsonParser.jsonParse(fileContent)
-            print(f"        Parsed File: {file}\n")
+            print(f"        parsed file: {file}\n")
+            print(f"        parsed json object: {result}\n")
             print(f"{fileContent}")
             return True
         

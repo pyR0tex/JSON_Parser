@@ -7,6 +7,7 @@ os.environ['PYTHONBREAKPOINT'] = '0'
 # JSON Parser class
 
 WHITESPACE = [" ", "\n", "\t", "\r"]
+BOOL_OR_NULL = {'true': True, 'false': False, 'null': None}
 
 class JSON_Exception(Exception):
     pass
@@ -47,13 +48,13 @@ class JSON_Parser:
        End HELPERS --------------------------------------------------------------------------------------------
     '''
 
-    # Entry from isJSON.py
-    def jsonParse(self, fileContent):
-        '''
-        Parses the JSON file
+    '''
+    Initiates the parsing of the json file
 
-        Input: File Content of input file
-        '''
+    Input: File Content of input file
+    '''
+    def jsonParse(self, fileContent):
+
         self.index = 0
         self.jsonStr = fileContent
         self.depth = 0
@@ -92,9 +93,30 @@ class JSON_Parser:
 
         result = self.parseString()
         if result == None:
+            result = self.parseBoolAndNull()
+        if result == None:
             result = self.parseObject()
         return result
     
+    # Parses boolean values
+    def parseBoolAndNull(self):
+
+        try:
+            # if bool or null
+            if self.jsonStr[self.index] in ['f', 't', 'n']:
+                boolStr = ""
+                while self.jsonStr[self.index].isalpha():
+                    boolStr += self.jsonStr[self.index]
+                    self.index += 1
+                if boolStr not in BOOL_OR_NULL.keys():
+                    raise JSON_Exception(f"expecting boolean (true or false) or Null (null) values")
+                return boolStr
+        except IndexError:
+            raise JSON_Exception(f"     index failure in parseBool")
+        except Exception as e:
+            raise JSON_Exception(f'{e}')
+        return None
+
     # Parses string values
     def parseString(self):
 
@@ -113,7 +135,7 @@ class JSON_Parser:
         except IndexError:
             raise JSON_Exception(f"     Missing closing quote")
         except Exception as e:
-            raise JSON_Exception(f'     Failed while Parsing String: {e}')
+            raise JSON_Exception(f'     failed while parsing string value: {e}')
         return None
 
     # Parses the JSON Object or inner objects
@@ -127,7 +149,7 @@ class JSON_Parser:
                 openingBrace = True
                 
                 while self.jsonStr[self.index] != "}":
-
+                    
                     if not openingBrace:
                         self.skip_whitespace()
                         self.process_comma()
@@ -136,12 +158,18 @@ class JSON_Parser:
                     key = self.parseString()
                     if not key:
                         raise JSON_Exception(f"     Key expected")
+                    
                     self.skip_whitespace()
                     self.process_colon()
                     self.skip_whitespace()
+
                     value = self.parseValue()
                     if not value:
                         raise JSON_Exception(f"     Value expected")
+                    
+                    if value in BOOL_OR_NULL.keys():
+                        value = BOOL_OR_NULL[value]
+                    
                     result[key] = value
                     self.skip_whitespace()
                     openingBrace = False
