@@ -17,13 +17,36 @@ class JSON_Parser:
         self.index = 0
         self.jsonStr = ""
         self.depth = 0
-
+    
+    '''
+        HELPERS --------------------------------------------------------------------------------------------
+    '''
     def getIndex(self):
         '''
         Returns the index
         '''
         return self.index
     
+    def skip_whitespace(self):
+        while self.index < len(self.jsonStr) and self.jsonStr[self.index] in WHITESPACE:
+            self.index += 1
+
+    def process_colon(self):
+        if self.index < len(self.jsonStr) and self.jsonStr[self.index] == ":":
+            self.index += 1
+        else:
+            raise JSON_Exception(f"     Colon expected")
+    
+    def process_comma(self):
+        if self.index < len(self.jsonStr) and self.jsonStr[self.index] == ",":
+            self.index += 1
+        else:
+            raise JSON_Exception(f"     Comma expected")
+    
+    '''
+       End HELPERS --------------------------------------------------------------------------------------------
+    '''
+
     # Entry from isJSON.py
     def jsonParse(self, fileContent):
         '''
@@ -61,22 +84,6 @@ class JSON_Parser:
             pass
 
         return result
-
-    def skip_whitespace(self):
-        while self.index < len(self.jsonStr) and self.jsonStr[self.index] in WHITESPACE:
-            self.index += 1
-
-    def process_colon(self):
-        if self.index < len(self.jsonStr) and self.jsonStr[self.index] == ":":
-            self.index += 1
-        else:
-            raise JSON_Exception(f"     Colon expected")
-    
-    def process_comma(self):
-        if self.index < len(self.jsonStr) and self.jsonStr[self.index] == ",":
-            self.index += 1
-        else:
-            raise JSON_Exception(f"     Comma expected")
         
     # Parses the value accordingly
     def parseValue(self):
