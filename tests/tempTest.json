@@ -3,6 +3,6 @@
     "keytest" : {},
     "key2": false,
     "key3": null,
-    "key4": 3
+    "key4": ["gff"]
 
 }

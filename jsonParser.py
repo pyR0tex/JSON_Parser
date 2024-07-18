@@ -98,6 +98,8 @@ class JSON_Parser:
             result = self. parseNumber()
         if result == None:
             result = self.parseObject()
+        if result == None:
+            result = self.parseArray()
         return result
     
     # Parses number values
@@ -106,8 +108,13 @@ class JSON_Parser:
         breakpoint()
 
         try:
-            if self.jsonStr[self.index].isdecimal():
+            if self.jsonStr[self.index].isdecimal() or self.jsonStr[self.index] == '-':
                 strNum = ""
+                if self.jsonStr[self.index] == '-':
+                    strNum += self.jsonStr[self.index]
+                    self.index += 1
+                if not self.jsonStr[self.index].isdecimal():
+                        raise JSON_Exception('numbers expected after sign (+ -)')
                 while self.jsonStr[self.index].isdecimal():
                     strNum += self.jsonStr[self.index]
                     self.index += 1
@@ -166,6 +173,35 @@ class JSON_Parser:
             raise JSON_Exception(f'     failed while parsing string value: {e}')
         return None
 
+    # Parses an Array Object
+    def parseArray(self):
+        try:
+            if self.jsonStr[self.index] == "[":
+                self.index += 1
+                self.skip_whitespace()
+                result = []
+                openingBrace = True
+                while self.jsonStr[self.index] != "]":
+                    if not openingBrace:
+                        self.skip_whitespace()
+                        self.process_comma()
+                        self.skip_whitespace()
+                    value = self.parseValue()
+                    if not value and value != {} and value != []:
+                        raise JSON_Exception(f"     Value expected")
+                    
+                    for k in BOOL_OR_NULL.keys():
+                        if value == k:
+                            value = k
+                    result.append(value)
+                    self.skip_whitespace()
+                    openingBrace = False
+                self.index += 1
+                return result
+        except IndexError:
+                raise JSON_Exception(f"     Missing closing array brace {']'}")
+        return None
+
     # Parses the JSON Object or inner objects
     def parseObject(self):
         try:
@@ -193,7 +229,7 @@ class JSON_Parser:
 
                     value = self.parseValue()
 
-                    if not value and value != {}:
+                    if not value and value != {} and value != []:
                         raise JSON_Exception(f"     Value expected")
                     
                     for k in BOOL_OR_NULL.keys():
@@ -212,7 +248,7 @@ class JSON_Parser:
                 self.depth -= 1
                 return result
         except IndexError:
-                raise JSON_Exception(f"     Missing closing brace")
+                raise JSON_Exception(f"     Missing closing object brace {'}'}")
         
         return None
 if __name__ == '__main__':
