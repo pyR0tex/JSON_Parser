@@ -95,9 +95,37 @@ class JSON_Parser:
         if result == None:
             result = self.parseBoolAndNull()
         if result == None:
+            result = self. parseNumber()
+        if result == None:
             result = self.parseObject()
         return result
     
+    # Parses number values
+    def parseNumber(self):
+
+        breakpoint()
+
+        try:
+            if self.jsonStr[self.index].isdecimal():
+                strNum = ""
+                while self.jsonStr[self.index].isdecimal():
+                    strNum += self.jsonStr[self.index]
+                    self.index += 1
+                if self.jsonStr[self.index] in ['e', '.']:
+                    strNum += self.jsonStr[self.index]
+                    self.index += 1
+                    if not self.jsonStr[self.index].isdecimal():
+                        raise JSON_Exception('numbers expected after exponent(e) or decimal(.)')
+                    while self.jsonStr[self.index].isdecimal():
+                        strNum += self.jsonStr[self.index]
+                        self.index += 1
+                return strNum
+        except IndexError:
+            raise(f'    index error in parseNumber')
+        except Exception as e:
+            raise JSON_Exception(f'{e}')
+        return None
+
     # Parses boolean values
     def parseBoolAndNull(self):
 
@@ -164,11 +192,17 @@ class JSON_Parser:
                     self.skip_whitespace()
 
                     value = self.parseValue()
-                    if not value:
+
+                    if not value and value != {}:
                         raise JSON_Exception(f"     Value expected")
                     
+                    for k in BOOL_OR_NULL.keys():
+                        if value == k:
+                            value = k
+                    '''
                     if value in BOOL_OR_NULL.keys():
                         value = BOOL_OR_NULL[value]
+                    '''
                     
                     result[key] = value
                     self.skip_whitespace()

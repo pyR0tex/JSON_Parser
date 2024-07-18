@@ -1,5 +1,8 @@
-{"key1": true,
-"key2": false,
-"key3": null,
-"key4": "value"
+{
+    "key1": true,
+    "keytest" : {},
+    "key2": false,
+    "key3": null,
+    "key4": 3
+
 }
