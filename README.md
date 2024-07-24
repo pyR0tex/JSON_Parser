@@ -19,6 +19,6 @@
 
 ## Testing:
   - Type: 'python isJson -test' and follow the instructions
-  ![test screenshot] (Testing_Screenshot.png)
+  ![test screenshot](Testing_Screenshot.png)
 
 
